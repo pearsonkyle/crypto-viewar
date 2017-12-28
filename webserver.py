@@ -16,7 +16,7 @@ db = Database( settings=json.load(open("readonly.json",'r')),
 @app.route('/select/<int:npts>',methods=['GET'])
 def select(npts=100):
     recent = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
-    jsons = [i.toJSON() for i in recent]
+    jsons = {'data': [i.toJSON() for i in recent] }
     resp = Response( json.dumps(jsons) ) 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
