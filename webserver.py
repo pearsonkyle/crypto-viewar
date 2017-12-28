@@ -14,7 +14,7 @@ db = Database( settings=json.load(open("readonly.json",'r')),
                dtype=Cryptocurrency )
 
 @app.route('/select/<int:npts>',methods=['GET'])
-def select(key='btc',npts=100):
+def select(npts=100):
     recent = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
     jsons = [i.toJSON() for i in recent]
     resp = Response( json.dumps(jsons) ) 
@@ -26,8 +26,5 @@ def index():
     return "Official API for Crypto ViewAR - iOS App"
 
 if __name__ == "__main__":
-    try:
-        print(' running on port =',sys.argv[1] )
-        app.run(host='0.0.0.0',port=sys.argv[1])
-    except:
-        app.run(host='0.0.0.0',debug=True)
+    print(' running on port =',sys.argv[1] )
+    app.run(host='0.0.0.0',port=sys.argv[1])
