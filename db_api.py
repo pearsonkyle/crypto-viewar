@@ -13,7 +13,7 @@ db = Database( settings=json.load(open("readonly.json",'r')),
                dtype=Cryptocurrency )
 
 @app.route('/select/<int:npts>',methods=['GET'])
-def select(key='eth',npts=100):
+def select(key='btc',npts=100):
     recent = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
     jsons = [i.toJSON() for i in recent]
     resp = Response( json.dumps(jsons) ) 
