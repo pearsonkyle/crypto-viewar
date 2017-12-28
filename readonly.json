@@ -1,0 +1,8 @@
+{
+    "dialect": "postgresql",
+    "username": "read_only_user",
+    "password": "Test1234",
+    "endpoint": "cryptocurrency.c4luhvcn1k1s.us-east-2.rds.amazonaws.com",
+    "port": 5432,
+    "dbname": "cryptocurrency"
+}
