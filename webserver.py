@@ -27,4 +27,4 @@ def index():
 
 if __name__ == "__main__":
     print(' running on port =',sys.argv[1] )
-    app.run(host='0.0.0.0',port=sys.argv[1])
+    app.run(host='0.0.0.0',port=int(sys.argv[1]) )
