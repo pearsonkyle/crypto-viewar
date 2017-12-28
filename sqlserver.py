@@ -122,7 +122,7 @@ class Cryptocurrency(Base):
         js = {}
         for k in self.cols():
             if isinstance(self[k],type(datetime.now()) ):
-                js[k] = self[k].strftime('%Y-%m-%d %H:%M')
+                js[k] = self[k].strftime('%Y-%m-%d %H:%M:%S')
             else:
                 js[k] = self[k]
         return js
