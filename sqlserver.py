@@ -118,14 +118,17 @@ class Cryptocurrency(Base):
             string += "{}:{}, ".format(k,self[k])
         return string[:-2]
     
-    def toJSON(self):
+    def toDict(self):
         js = {}
         for k in self.cols():
             if isinstance(self[k],type(datetime.now()) ):
                 js[k] = self[k].strftime('%Y-%m-%d %H:%M')
             else:
                 js[k] = self[k]
-        return json.dumps(js)
+        return js
+    
+    def toJSON(self):
+        return json.dumps(self.toDict())
 
 if __name__ == "__main__":
     # set up database connection 
