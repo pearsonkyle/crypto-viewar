@@ -21,6 +21,40 @@ def select(npts=100):
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
+# http://ec2-18-220-171-141.us-east-2.compute.amazonaws.com:6969/
+@app.route('/select/<int:binsize>/<int:npts>',methods=['GET'])
+def select_bin(binsize=1,npts=100):
+
+    # TODO make sure points are not negative 
+
+    serverpts = int(binsize * npts)
+    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
+    
+    binned_list = []
+
+    # compute averages for each bin 
+    for i in range(npts):
+        
+        coin = Cryptocurrency()
+
+        # get the middle index
+        idx = int( (i+0.5)*binsize )
+        coin.timestamp = data[idx].timestamp
+
+        # compute average price for each coin
+        sub = data[i*binsize:(i+1)*binsize]
+        for k in coin.keys():
+            price_list = [sub[j][k] for j in range(len(sub))]
+            coin[k] = round(sum(price_list)/len(price_list),2)
+
+        binned_list.append(coin)
+
+    jsons = {'data': [i.toDict() for i in binned_list] }
+    resp = Response( json.dumps(jsons) ) 
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp 
+
+
 @app.route('/',methods=['GET'])
 def index():
     return "Official API for Crypto ViewAR - iOS App"
