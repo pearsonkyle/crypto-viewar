@@ -53,6 +53,7 @@ class Database():
                 return foo( self )
             except:
                 self.create_session()
+                print('creating session')
                 return foo( self )
         return magic
 
@@ -72,14 +73,11 @@ class Database():
 
         return dates,values
 
-    def __del__(self):
-        try:
-            print('closing sessions')
-            self.session.close()
-        except:
-            pass 
+    def close(self):
+        self.sess.close()
+        self.engine.dispose()
 
-
+            
 class Cryptocurrency(Base):
     __tablename__ = "cryptocurrency" # TODO change to gdax?
 

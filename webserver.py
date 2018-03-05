@@ -9,13 +9,16 @@ from sqlserver import Database, Cryptocurrency
 
 app = Flask(__name__)
 
-# set up database connection 
-db = Database( settings=json.load(open("readonly.json",'r')),
-               dtype=Cryptocurrency )
+settings = json.load(open("readonly.json",'r'))
 
 @app.route('/select/<int:npts>',methods=['GET'])
 def select(npts=100):
-    recent = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
+    # set up database connection 
+    db = Database( settings=settings, dtype=Cryptocurrency )
+    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
+    db.close()
+    del db
+
     jsons = {'data': [i.toDict() for i in recent] }
     resp = Response( json.dumps(jsons) ) 
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -24,15 +27,22 @@ def select(npts=100):
 # http://ec2-18-220-171-141.us-east-2.compute.amazonaws.com:6969/
 @app.route('/select/<int:binsize>/<int:npts>',methods=['GET'])
 def select_bin(binsize=1,npts=100):
-
-    # TODO make sure points are not negative 
-
-    serverpts = int(binsize * npts)
-    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
     
-    binned_list = []
+    # parse inputs
+    binsize = int(binsize)
+    npts = int(npts)
+    if binsize < 0: binsize *= 1
+    if npts < 0: npts *= 1
+    serverpts = int(binsize * npts)
+    
+    # get data from database
+    db = Database( settings=settings, dtype=Cryptocurrency )
+    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
+    db.close()
+    del db
 
     # compute averages for each bin 
+    binned_list = []
     for i in range(npts):
         
         coin = Cryptocurrency()
