@@ -11,6 +11,12 @@ app = Flask(__name__)
 
 settings = json.load(open("readonly.json",'r'))
 
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return 'hello world'
+
 @app.route('/select/<int:npts>',methods=['GET'])
 def select(npts=100):
     # set up database connection 
@@ -65,6 +71,9 @@ def select_bin(binsize=1,npts=100):
     return resp 
 
 
+
+
+    
 @app.route('/',methods=['GET'])
 def index():
     return "Official API for Crypto ViewAR - iOS App"
