@@ -21,7 +21,7 @@ def catch_all(path):
 def select(npts=100):
     # set up database connection 
     db = Database( settings=settings, dtype=Cryptocurrency )
-    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
+    data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
     db.close()
     del db
 
