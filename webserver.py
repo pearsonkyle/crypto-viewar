@@ -5,12 +5,11 @@ import datetime
 from flask import Flask, request,jsonify,Response
 from sqlalchemy import desc
 
-from sqlserver import Database, Cryptocurrency
+from autoexchange.Database import Database, CoinbaseproData
 
 app = Flask(__name__)
 
 settings = json.load(open("readonly.json",'r'))
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -20,12 +19,12 @@ def catch_all(path):
 @app.route('/select/<int:npts>',methods=['GET'])
 def select(npts=100):
     # set up database connection 
-    db = Database( settings=settings, dtype=Cryptocurrency )
+    db = Database( settings=settings, dtype=CoinbaseproData )
     data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(npts).all()
     db.close()
     del db
 
-    jsons = {'data': [i.toDict() for i in recent] }
+    jsons = {'data': [i.toJSON() for i in data] }
     resp = Response( json.dumps(jsons) ) 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
@@ -33,7 +32,7 @@ def select(npts=100):
 # http://ec2-18-220-171-141.us-east-2.compute.amazonaws.com:6969/
 @app.route('/select/<int:binsize>/<int:npts>',methods=['GET'])
 def select_bin(binsize=1,npts=100):
-    
+    # TODO attach datetime
     # parse inputs
     binsize = int(binsize)
     npts = int(npts)
@@ -42,7 +41,7 @@ def select_bin(binsize=1,npts=100):
     serverpts = int(binsize * npts)
     
     # get data from database
-    db = Database( settings=settings, dtype=Cryptocurrency )
+    db = Database( settings=settings, dtype=CoinbaseproData )
     data = db.session.query(db.dtype).order_by(desc(db.dtype.timestamp)).limit(serverpts).all()
     db.close()
     del db
@@ -51,7 +50,7 @@ def select_bin(binsize=1,npts=100):
     binned_list = []
     for i in range(npts):
         
-        coin = Cryptocurrency()
+        coin = CoinbaseproData()
 
         # get the middle index
         idx = int( (i+0.5)*binsize )
@@ -65,14 +64,10 @@ def select_bin(binsize=1,npts=100):
 
         binned_list.append(coin)
 
-    jsons = {'data': [i.toDict() for i in binned_list] }
+    jsons = {'data': [i.toJSON() for i in binned_list] }
     resp = Response( json.dumps(jsons) ) 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp 
-
-
-
-
     
 @app.route('/',methods=['GET'])
 def index():
